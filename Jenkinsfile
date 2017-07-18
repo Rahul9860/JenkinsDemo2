@@ -1,31 +1,19 @@
-node {
-        stage("Main build") {
-
-            checkout scm
-
-            docker.image('ruby:2.3.1').inside {
-
-              stage("Install Bundler") {
-                sh "gem install bundler --no-rdoc --no-ri"
-              }
-
-              stage("Use Bundler to install dependencies") {
-                sh "bundle install"
-              }
-
-              stage("Build package") {
-                sh "bundle exec rake build:deb"
-              }
-
-              stage("Archive package") {
-                archive (includes: 'pkg/*.deb')
-              }
-
-           }
-
+pipeline {
+    agent none 
+    stages {
+        stage('Example Build') {
+            agent { docker 'maven:3-alpine' } 
+            steps {
+                echo 'Hello, Maven'
+                sh 'mvn --version'
+            }
         }
-
-        // Clean up workspace
-        step([$class: 'WsCleanup'])
-
+        stage('Example Test') {
+            agent { docker 'openjdk:8-jre' } 
+            steps {
+                echo 'Hello, JDK'
+                sh 'java -version'
+            }
+        }
+    }
 }
